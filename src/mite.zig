@@ -204,8 +204,8 @@ pub fn bindParameters(stmt: ?*c.sqlite3_stmt, params: anytype) Error!void {
 /// semantics of this function. See `bindParameters` if you want to use SQLITE_STATIC.
 ///
 /// There's a complication if you want to use sqlite's "transient" lifetime option: zig does not allow
-/// you to use sqlite's built-in SQLITE_TRANSIENT constant. While it's type is a function pointer, it is
-/// actually the fixed value -1. Zig does not allow this becsuse -1 is not a valid alignment for a function.
+/// the use of sqlite's built-in SQLITE_TRANSIENT constant. While it's type is a function pointer, it is
+/// actually the fixed value -1. Zig does not allow this because -1 is not a valid alignment for a function.
 ///
 /// To workaround this, mite provides `sqlite3_bind_text64_lifetime`() and `sqlite3_bind_blob64_lifetime`().
 /// These actually point directly to sqlite's sqlite3_bind_text64() and sqlite3_bind_blob64(), but allow the
@@ -896,7 +896,15 @@ pub const sqlite3_bind_text64_lifetime: *const fn (?*c.sqlite3_stmt, c_int, [*c]
 /// This works around the issue that zig doesn't allow sqlite's special SQLITE_TRANSIENT value to be used.
 pub const sqlite3_bind_blob64_lifetime: *const fn (?*c.sqlite3_stmt, c_int, ?*const anyopaque, c.sqlite3_uint64, Sqlite3Lifetime) callconv(.c) c_int = @ptrCast(&c.sqlite3_bind_blob64);
 
-/// Lifetime values for `sqlite3_bind_text64_lifetime` and `sqlite3_bind_blob64_lifetime`.
+/// Calls through to sqlite's `sqlite3_result_text64`, but allows the lifetime to be specified as .TRANSIENT or .STATIC.
+/// This works around the issue that zig doesn't allow sqlite's special SQLITE_TRANSIENT value to be used.
+pub const sqlite3_result_text64_lifetime: *const fn (?*c.sqlite3_context, [*c]const u8, c.sqlite3_uint64, Sqlite3Lifetime) callconv(.c) void = @ptrCast(&c.sqlite3_result_text64);
+
+/// Calls through to sqlite's `sqlite3_result_blob64`, but allows the lifetime to be specified as .TRANSIENT or .STATIC.
+/// This works around the issue that zig doesn't allow sqlite's special SQLITE_TRANSIENT value to be used.
+pub const sqlite3_result_blob64_lifetime: *const fn (?*c.sqlite3_context, ?*const anyopaque, c.sqlite3_uint64, Sqlite3Lifetime) callconv(.c) void = @ptrCast(&c.sqlite3_result_blob64);
+
+/// Lifetime values for `sqlite3_bind_text64_lifetime`, `sqlite3_bind_blob64_lifetime`, `sqlite3_result_text64_lifetime`, and `sqlite3_result_blob64_lifetime`.
 pub const Sqlite3Lifetime = enum(isize) {
     /// corresponds to SQLITE3_TRANSIENT
     TRANSIENT = -1,

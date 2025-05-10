@@ -4,6 +4,9 @@ const std = @import("std");
 // declaratively construct a build graph that will be executed by an external
 // runner.
 pub fn build(b: *std.Build) void {
+    const sqliteFolder = "src/sqlite-amalgamation-3490200";
+    const sqliteCFile = comptime std.fmt.comptimePrint("{s}/sqlite3.c", .{sqliteFolder});
+
     // Standard target options allows the person running `zig build` to choose
     // what target to build for. Here we do not override the defaults, which
     // means any target is allowed, and the default is native. Other options
@@ -23,8 +26,7 @@ pub fn build(b: *std.Build) void {
         .target = target,
         .optimize = optimize,
     });
-    lib.addIncludePath(.{ .src_path = .{ .owner = b, .sub_path = "src/sqlite-amalgamation-3470200" } });
-    // lib.addCSourceFile(.{ .file = .{ .cwd_relative = "src/sqlite-amalgamation-3470200/sqlite3.c" } });
+    lib.addIncludePath(.{ .src_path = .{ .owner = b, .sub_path = sqliteFolder } });
 
     // This declares intent for the library to be installed into the standard
     // location when the user invokes the "install" step (the default step when
@@ -37,8 +39,8 @@ pub fn build(b: *std.Build) void {
         .target = target,
         .optimize = optimize,
     });
-    exe.addIncludePath(.{ .src_path = .{ .owner = b, .sub_path = "src/sqlite-amalgamation-3470200" } });
-    exe.addCSourceFile(.{ .file = .{ .cwd_relative = "src/sqlite-amalgamation-3470200/sqlite3.c" } });
+    exe.addIncludePath(.{ .src_path = .{ .owner = b, .sub_path = sqliteFolder } });
+    exe.addCSourceFile(.{ .file = .{ .cwd_relative = sqliteCFile } });
 
     // This declares intent for the executable to be installed into the
     // standard location when the user invokes the "install" step (the default
@@ -76,8 +78,8 @@ pub fn build(b: *std.Build) void {
         .target = target,
         .optimize = optimize,
     });
-    test_mite.addIncludePath(.{ .src_path = .{ .owner = b, .sub_path = "src/sqlite-amalgamation-3470200" } });
-    test_mite.addCSourceFile(.{ .file = .{ .cwd_relative = "src/sqlite-amalgamation-3470200/sqlite3.c" } });
+    test_mite.addIncludePath(.{ .src_path = .{ .owner = b, .sub_path = sqliteFolder } });
+    test_mite.addCSourceFile(.{ .file = .{ .cwd_relative = sqliteCFile } });
     b.installArtifact(test_mite);
     const run_test_mite = b.addRunArtifact(test_mite);
 
@@ -95,7 +97,7 @@ pub fn build(b: *std.Build) void {
         .target = target,
         .optimize = optimize,
     });
-    test_mite_mock_sqlite.addIncludePath(.{ .src_path = .{ .owner = b, .sub_path = "src/sqlite-amalgamation-3470200" } });
+    test_mite_mock_sqlite.addIncludePath(.{ .src_path = .{ .owner = b, .sub_path = sqliteFolder } });
     b.installArtifact(test_mite_mock_sqlite);
     const run_test_mite_mock_sqlite = b.addRunArtifact(test_mite_mock_sqlite);
 
